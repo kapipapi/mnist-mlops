@@ -3,6 +3,9 @@ import tkinter as tk
 from PIL import Image, ImageDraw
 import mlflow
 
+DEBUG = False
+
+
 class DigitRecognizerApp:
     def __init__(self, window, loaded_model):
         self.window = window
@@ -11,18 +14,16 @@ class DigitRecognizerApp:
         self.draw = ImageDraw.Draw(self.image)
         self.title = tk.Label(window)
         self.title.pack()
-        
+
         self.canvas = tk.Canvas(window, width=280, height=280, bg="white")
         self.canvas.pack()
+
         self.canvas.bind("<B1-Motion>", self.draw_lines)
         self.canvas.bind("<ButtonRelease-1>", lambda _: self.predict_value())
 
-        # Create a button to predict the value
-        self.save_button = tk.Button(window, text="Predict value", command=self.predict_value)
-        self.save_button.pack()
-
         # Create a button to clean the canvas
-        self.clean_button = tk.Button(window, text="Clean", command=self.clean_canvas)
+        self.clean_button = tk.Button(
+            window, text="Clean", command=self.clean_canvas)
         self.clean_button.pack()
 
     def draw_lines(self, event):
@@ -30,7 +31,8 @@ class DigitRecognizerApp:
         y = event.y
 
         size = 20
-        self.canvas.create_oval(x-size//2, y-size//2, x+size//2, y+size//2, fill="black")
+        self.canvas.create_oval(x-size//2, y-size//2,
+                                x+size//2, y+size//2, fill="black")
         self.draw.ellipse((x-size//2, y-size//2, x+size//2, y+size//2), fill=0)
 
     def predict_value(self):
@@ -48,12 +50,12 @@ class DigitRecognizerApp:
         side = max(img_data.shape[0], img_data.shape[1])
         pad_x = max(side - img_data.shape[0], 0)
         pad_y = max(side - img_data.shape[1], 0)
-        
-        img_data = np.pad(img_data, ((pad_x//2, pad_x//2), (pad_y//2, pad_y//2)), 'constant', constant_values=255)
 
-        from PIL import Image
-        im = Image.fromarray(img_data)
-        im.save("test.png")
+        img_data = np.pad(img_data, ((pad_x//2, pad_x//2),
+                          (pad_y//2, pad_y//2)), 'constant', constant_values=255)
+
+        if DEBUG:
+            Image.fromarray(img_data).save("test.png")
 
         resized = np.resize(img_data, (28, 28))
         transformed = np.array(resized, dtype=np.float32) / 255.
@@ -69,9 +71,11 @@ class DigitRecognizerApp:
         self.draw = ImageDraw.Draw(self.image)
         self.title.config(text="Draw a digit from 0 to 9")
 
+
 if __name__ == "__main__":
     mlflow.set_tracking_uri("http://127.0.0.1:5000")
-    loaded_model = mlflow.pyfunc.load_model('runs:/cd39b8ed1b3a4f579b712181fa3576f5/mnist-model')
+    loaded_model = mlflow.pyfunc.load_model(
+        'runs:/cd39b8ed1b3a4f579b712181fa3576f5/mnist-model')
 
     window = tk.Tk()
     app = DigitRecognizerApp(window, loaded_model)
