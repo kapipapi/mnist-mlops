@@ -1,0 +1,9 @@
+name: MNIST custom net
+
+python_env: python_env.yaml
+
+entry_points:
+    main:
+        parameters:
+            epochs: {type: int, default: 10}
+        command: "python train.py --epochs {epochs}"

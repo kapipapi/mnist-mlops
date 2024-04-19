@@ -75,7 +75,7 @@ class DigitRecognizerApp:
 if __name__ == "__main__":
     mlflow.set_tracking_uri("http://127.0.0.1:5000")
     loaded_model = mlflow.pyfunc.load_model(
-        'runs:/cd39b8ed1b3a4f579b712181fa3576f5/mnist-model')
+        'runs:/f31d1562ee7e40cf90e77728d97b0e81/model')
 
     window = tk.Tk()
     app = DigitRecognizerApp(window, loaded_model)
